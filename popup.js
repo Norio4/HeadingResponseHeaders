@@ -7,62 +7,55 @@ async function getCurrentTab() {
 }
 
 async function runFetch() {
-    let tab = await getCurrentTab();
-    let url = tab.url;
-    let results = document.getElementById("results");
-    var loading = "<pre><code>" + "Loading .."  + "</code></pre>"
+    const tab = await getCurrentTab();
+    const url = tab.url;
+    const results = document.getElementById("results");
+    const loading = "<pre><code>" + "Loading .."  + "</code></pre>"
     results.innerHTML = loading;
-    chrome.scripting.executeScript(
-    {
-        target: {tabId: tab.id},
-        func: fetchHeaders,
-        args: [url, results],
-
-    },
-    (injectionResults) => {
-          // for (const frameResult of injectionResults)
-          // alert('Frame: ' + frameResult.result);
-    });
+    const res = await fetchHeaders(url)
+      .catch(function(err){
+        return;
+      });
+    if(!res){
+      return;
+    }
+    let str = `<h1>Heading Response Headers</h1>
+              <h2>${url}</h2>`;
+    if(res){
+      for(let key in res){
+        str += `<li>${key}: ${res[key]}</li>`;
+      }
+    }else{
+      str += "<p>Error</p>";
+    }
+    const html = `<ul>${str}</ul>`;
+    results.innerHTML = html;
 }
 
 function fetchHeaders(url, results) {
-    alert(url);
-    var req = new XMLHttpRequest();
-    req.onload = function() {
-        var headers = req.getAllResponseHeaders().split(/\r?\n/);
+    return new Promise(function(resolve, reject){
+      const req = new XMLHttpRequest();
+      req.onload = function() {
+          const headers = req.getAllResponseHeaders().split(/\r?\n/);
+          const jsonObj = {};
+          for (let i= 0; i < headers.length; i++) {
+              const thisItem = headers[i];
+              console.log(thisItem);
+              const firstIndex = thisItem.indexOf(':');
+              const key = thisItem.substring(0, firstIndex);
+              const value = thisItem.substring(firstIndex + 1).replace(" ", "");
+              jsonObj[key] = value;
+          }
+          delete jsonObj[""];
+          return resolve(jsonObj);
+      };
+      req.onerror = function() {
+        return reject();
+      };
 
-        var _data = new Object();
-        var jsonObj = new Object();
-        var i =0;
-        for (i= 0; i < headers.length; i++) {
-            var thisItem = headers[i];
-            console.log(thisItem);
-            var key = thisItem.substring(0, thisItem.indexOf(':'));
-            var value = thisItem.substring(thisItem.indexOf(':')+1).replace(" ", "");;
-            jsonObj[key] = value;
-        }
-        delete jsonObj[""];
-        // alert(JSON.stringify(jsonObj, null, 2));
-        var keys = Object.keys(jsonObj);
-        keys.sort();
-        i, len = keys.length;
-        var res = {}
-        for (i = 0; i < len; i++) {
-          k = keys[i];
-          res[k] = jsonObj[k];
-        }
-        alert(JSON.stringify(res, null, 2));
-
-        // var prettyJson = "<pre><code>" + JSON.stringify(jsonObj, null, 2) + "</code></pre>"
-        // var results = document.getElementById("results");
-        // results.innerHTML = prettyJson;
-    };
-    req.onerror = function() {
-      alert("Network Error");
-    };
-
-    req.open('GET', url, true);
-    req.send(null);
+      req.open('GET', url, true);
+      req.send(null);
+    });
 }
 
 runFetch()
