@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Heading Response Headers",
-    "version": "0.8.9",
+    "version": "0.9.0",
     "author": "Norio4 Yahata",
     "description": "Simple! Retrieves and displays the Response Headers information of the current page using Only HTTP GET for debugging.",
     "icons": {
