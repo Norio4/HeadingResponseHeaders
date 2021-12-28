@@ -12,7 +12,7 @@
 ## Get it
 ### Google
  
-Reviewing now
+[![Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/iNEddTyWiMfLSwFD6qGq.png)](https://chrome.google.com/webstore/detail/heading-response-headers/hffmllbdjjabidjlbjgikalbbfggggki)
  
 ## Usage
  
